@@ -11,15 +11,12 @@ pipeline {
         }
 
         stage('Test') {
-         docker.image('node-app:latest').withRun('-d=true') {c ->
-            docker.image('node-app:latest').inside{
-               sh "ls"
-               sh "npm test"
+            steps {
+                echo 'Testing..'
+                sh 'docker run node-app npm test'
             }
         }
-        }
-                
- 
+
         stage('Deploy') {
             steps {
                 echo 'Deploying....'

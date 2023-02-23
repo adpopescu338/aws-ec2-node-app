@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Test') {
+            steps {
+                echo 'Testing..'
+                sh 'npm test'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building..'
+                docker build -t node-app .
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+            }
+        }
+    }
+}

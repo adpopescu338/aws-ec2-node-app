@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('2255ea73-6c59-4ead-b350-a05ba2022fcc')
+    }
 
     stages {
         stage('Build') {
@@ -29,15 +32,18 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'docker push adpopescu3382/devops-playground'
             }
         }
     }
     post { 
         always { 
             cleanWs()
-                // stop and remove container
-                sh 'docker stop node-app'
-                sh 'docker rm node-app'
+            sh 'docker logout'
+            // stop and remove container
+            sh 'docker stop node-app'
+            sh 'docker rm node-app'
         }
     }
 }

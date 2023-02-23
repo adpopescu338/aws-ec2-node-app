@@ -17,7 +17,10 @@ pipeline {
                 // run tests
                 sh 'docker exec node-app sh -c "npm test"'
                 echo "test successfull"
+
                 // check that server is running
+                // install curl in container for this to work
+                sh "docker exec node-app sh -c 'apt-get update && apt-get install -y curl'"
                 sh 'docker exec node-app sh -c "curl -s http://localhost:3000/hello"'
                 echo "server is running fine"
 

@@ -5,15 +5,17 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-                sh "docker build -t node-app ."
-                sh "docker tag node-app:latest"
+                sh "docker build -t node-app:latest ."
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'docker run node-app npm test'
+                sh 'docker run -d node-app npm test'
+                // stop and remove container
+                sh 'docker stop node-app'
+                sh 'docker rm node-app'
             }
         }
 

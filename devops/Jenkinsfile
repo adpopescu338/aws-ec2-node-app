@@ -13,9 +13,14 @@ pipeline {
             steps {
                 echo 'Testing..'
                 // start container
-                sh 'docker run -d --name node-app node-app:latest'
+                sh 'docker run -d --name node-app -p 3000 node-app:latest'
                 // run tests
                 sh 'docker exec node-app sh -c "npm test"'
+                echo "test successfull"
+                // check that server is running
+                sh 'docker exec node-app sh -c "curl -s http://localhost:3000/hello"'
+                echo "server is running fine"
+
                 // stop and remove container
                 sh 'docker stop node-app'
                 sh 'docker rm node-app'

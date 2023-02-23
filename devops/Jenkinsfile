@@ -11,6 +11,9 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
+                echo "Building image $IMAGE_NAME:$IMAGE_TAG"
+                echo " Branch name: $BRANCH_NAME"
+                echo " Branch name: $env.BRANCH_NAME"
                 sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
             }
         }

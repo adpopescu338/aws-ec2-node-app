@@ -2,12 +2,6 @@ pipeline {
     agent any
 
     stages {
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-                sh 'npm test'
-            }
-        }
         stage('Build') {
             steps {
                 echo 'Building..'
@@ -15,6 +9,17 @@ pipeline {
                 sh "docker tag node-app:latest"
             }
         }
+
+        stage('Test') {
+         docker.image('node-app:latest').withRun('-d=true') {c ->
+            docker.image('node-app:latest').inside{
+               sh "ls"
+               sh "npm test"
+            }
+        }
+        }
+                
+ 
         stage('Deploy') {
             steps {
                 echo 'Deploying....'

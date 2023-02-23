@@ -11,7 +11,8 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-                docker build -t node-app .
+                sh "docker build -t node-app ."
+                sh "docker tag node-app:latest"
             }
         }
         stage('Deploy') {

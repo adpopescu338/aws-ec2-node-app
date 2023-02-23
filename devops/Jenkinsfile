@@ -12,7 +12,10 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'docker run -d node-app npm test'
+                // start container
+                sh 'docker run -d -p 3000:3000 --name node-app node-app:latest'
+                // run tests
+                sh 'docker exec -it node-app sh -c "npm test"'
                 // stop and remove container
                 sh 'docker stop node-app'
                 sh 'docker rm node-app'

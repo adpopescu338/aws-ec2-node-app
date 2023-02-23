@@ -3,7 +3,7 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = credentials('2255ea73-6c59-4ead-b350-a05ba2022fcc')
         IMAGE_NAME = 'adpopescu3382/devops-playground'
-        IMAGE_TAG = 'latest'
+        IMAGE_TAG = 'node-app-master'
         CONTAINER_NAME = 'node-app'
     }
 

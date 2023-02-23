@@ -2,13 +2,16 @@ pipeline {
     agent any
     environment {
         DOCKERHUB_CREDENTIALS = credentials('2255ea73-6c59-4ead-b350-a05ba2022fcc')
+        IMAGE_NAME = 'adpopescu3382/devops-playground'
+        IMAGE_TAG = 'latest'
+        CONTAINER_NAME = 'node-app'
     }
 
     stages {
         stage('Build') {
             steps {
                 echo 'Building..'
-                sh "docker build -t node-app:latest ."
+                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
             }
         }
 
@@ -16,15 +19,15 @@ pipeline {
             steps {
                 echo 'Testing..'
                 // start container
-                sh 'docker run -d --name node-app -p 3000 node-app:latest'
+                sh "docker run -d --name $CONTAINER_NAME -p 3000 $IMAGE_NAME:$IMAGE_TAG"
                 // run tests
-                sh 'docker exec node-app sh -c "npm test"'
+                sh "docker exec $CONTAINER_NAME sh -c 'npm test'"
                 echo "test successfull"
 
                 // check that server is running
                 // install curl in container for this to work
-                sh "docker exec node-app sh -c 'apt-get update && apt-get install -y curl'"
-                sh 'docker exec node-app sh -c "curl -s http://localhost:3000/hello"'
+                sh "docker exec $CONTAINER_NAME sh -c 'apt-get update && apt-get install -y curl'"
+                sh "docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello'"
                 echo "server is running fine"
             }
         }
@@ -33,7 +36,7 @@ pipeline {
             steps {
                 echo 'Deploying....'
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh 'docker push adpopescu3382/devops-playground'
+                sh "docker push $IMAGE_NAME:$IMAGE_TAG"
             }
         }
     }
@@ -42,8 +45,10 @@ pipeline {
             cleanWs()
             sh 'docker logout'
             // stop and remove container
-            sh 'docker stop node-app'
-            sh 'docker rm node-app'
+            sh "docker stop $CONTAINER_NAME"
+            sh "docker rm $CONTAINER_NAME"
+            // remove image
+            sh "docker rmi $IMAGE_NAME:$IMAGE_TAG"
         }
     }
 }

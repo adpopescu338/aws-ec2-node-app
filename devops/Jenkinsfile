@@ -35,6 +35,7 @@ pipeline {
                     } else {
                         echo 'No previous build found, building new image'
                         sh "docker build -f devops/DockerfileBase -t $REGISTRY:$IMAGE_TAG-base ."
+                                                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                         sh "docker push $REGISTRY:$IMAGE_TAG-base"
                     }
                 }
@@ -47,7 +48,7 @@ pipeline {
                 echo "Building image $REGISTRY:$IMAGE_TAG"
                 echo " Branch name: $BRANCH_NAME"
                 echo " Branch name: $env.BRANCH_NAME"
-                sh "docker build -t $REGISTRY:$IMAGE_TAG ."
+                sh "docker build -t $REGISTRY:$IMAGE_TAG ./devops/$BRANCH_NAME/Dockerfile"
             }
         }
 

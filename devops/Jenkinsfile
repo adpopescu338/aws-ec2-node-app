@@ -2,19 +2,35 @@ pipeline {
     agent any
     environment {
         DOCKERHUB_CREDENTIALS = credentials('2255ea73-6c59-4ead-b350-a05ba2022fcc')
-        IMAGE_NAME = 'adpopescu3382/devops-playground'
+        REGISTRY = 'adpopescu3382/devops-playground'
         IMAGE_TAG = "node-app-${BRANCH_NAME}"
         CONTAINER_NAME = 'node-app'
     }
 
     stages {
+        stage('Check if base image needs to be updated') {
+            steps {
+                script {
+                    dockerBuild(
+                        dockerfile: '/devops/DockerfileBase',
+                        contextPath: '.',
+                        additionalBuildArgs: '',
+                        tag: "$REGISTRY:$IMAGE_TAG-base",
+                        push: true,
+                        registry: REGISTRY,
+                        registryCredentials: DOCKERHUB_CREDENTIALS
+                    )
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 echo 'Building..'
-                echo "Building image $IMAGE_NAME:$IMAGE_TAG"
+                echo "Building image $REGISTRY:$IMAGE_TAG"
                 echo " Branch name: $BRANCH_NAME"
                 echo " Branch name: $env.BRANCH_NAME"
-                sh "docker build -t $IMAGE_NAME:$IMAGE_TAG ."
+                sh "docker build -t $REGISTRY:$IMAGE_TAG ."
             }
         }
 
@@ -22,9 +38,9 @@ pipeline {
             steps {
                 echo 'Testing..'
                 // start container
-                sh "docker run -d --name $CONTAINER_NAME -p 3000 $IMAGE_NAME:$IMAGE_TAG"
+                sh "docker run -d --name $CONTAINER_NAME -p 3000 $REGISTRY:$IMAGE_TAG"
                 // run tests
-                sh "docker exec $CONTAINER_NAME sh -c 'npm test'"
+                sh "docker exec $CONTAINER_NAME sh -c 'yarn test'"
                 echo "test successfull"
 
                 // check that server is running
@@ -39,7 +55,7 @@ pipeline {
             steps {
                 echo 'Deploying....'
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh "docker push $IMAGE_NAME:$IMAGE_TAG"
+                sh "docker push $REGISTRY:$IMAGE_TAG"
             }
         }
     }
@@ -51,7 +67,7 @@ pipeline {
             sh "docker stop $CONTAINER_NAME"
             sh "docker rm $CONTAINER_NAME"
             // remove image
-            sh "docker rmi $IMAGE_NAME:$IMAGE_TAG"
+            sh "docker rmi $REGISTRY:$IMAGE_TAG"
         }
     }
 }

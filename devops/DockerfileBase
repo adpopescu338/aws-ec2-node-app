@@ -1,11 +1,12 @@
 FROM node:slim
 
 RUN apt-get update && apt-get install -y curl
-RUN echo "which yarn: $(which yarn)"
-#RUN npm install -g yarn
+
+#RUN npm install -g yarn not needed, yarn is already installed in the base image. uncomment if you change base image
 
 WORKDIR /app
 
-COPY package*.json .
+COPY package.json .
+COPY yarn.lock .
 
 RUN yarn install --production=true --frozen-lockfile

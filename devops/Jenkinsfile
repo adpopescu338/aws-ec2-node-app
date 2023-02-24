@@ -26,6 +26,7 @@ pipeline {
                         if (DOCKERFILE_BASE != lastDockerfileBase) {
                             echo 'DockerfileBase has changed, building new image'
                             sh "docker build -f devops/DockerfileBase -t $REGISTRY:$IMAGE_TAG-base ."
+                            sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                             sh "docker push $REGISTRY:$IMAGE_TAG-base"
                             env.BASE_IMAGE = DOCKERFILE_BASE
                         } else {

@@ -9,46 +9,48 @@ pipeline {
     }
 
     stages {
-        stage('Check if base image needs to be updated') {
+        stage('Base image updated check') {
             steps {
                 script {
                     echo 'Checking if base image needs to be updated'
-                    echo "DOCKERFILE_BASE: $DOCKERFILE_BASE"
-                    echo "-----------------------0"
-                    echo "DOCKERFILE_BASE: ${env.DOCKERFILE_BASE}"
-                    echo "-----------------------1"
-                    echo "currentBuild.previousBuild: ${currentBuild.previousBuild.buildVariables?.BASE_IMAGE}"
-                    echo "-----------------------2"
 
                     if (currentBuild.previousBuild) {
                         echo 'Previous build found'
                         def lastDockerfileBase = currentBuild.previousBuild.buildVariables?.BASE_IMAGE
                         if (DOCKERFILE_BASE != lastDockerfileBase) {
                             echo 'DockerfileBase has changed, building new image'
+                            // build new base image
                             sh "docker build -f devops/DockerfileBase -t $REGISTRY:$IMAGE_TAG-base ."
+                            // docker login
                             sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                            // push image to registry
                             sh "docker push $REGISTRY:$IMAGE_TAG-base"
-                            env.BASE_IMAGE = DOCKERFILE_BASE
+                            echo 'Image pushed to registry'
                         } else {
                             echo 'DockerfileBase has not changed, using existing image'
                         }
                     } else {
                         echo 'No previous build found, building new image'
+                        // build new base image
                         sh "docker build -f devops/DockerfileBase -t $REGISTRY:$IMAGE_TAG-base ."
-                                                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                        // docker login
+                        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                        // push image to registry
                         sh "docker push $REGISTRY:$IMAGE_TAG-base"
+                        echo 'Image pushed to registry'
                     }
+
+                    // update env variable for next build
+                    env.BASE_IMAGE = DOCKERFILE_BASE
                 }
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building..'
-                echo "Building image $REGISTRY:$IMAGE_TAG"
-                echo " Branch name: $BRANCH_NAME"
-                echo " Branch name: $env.BRANCH_NAME"
-                sh "docker build -t $REGISTRY:$IMAGE_TAG ./devops/$BRANCH_NAME"
+                echo "Building image $REGISTRY:$IMAGE_TAG for branch $BRANCH_NAME"
+                // pass base image as build arg to Dockerfile
+                sh "docker build -t $REGISTRY:$IMAGE_TAG ./devops/$BRANCH_NAME --build-arg BASE_IMAGE=$REGISTRY:$IMAGE_TAG-base"
             }
         }
 
@@ -62,8 +64,6 @@ pipeline {
                 echo "test successfull"
 
                 // check that server is running
-                // install curl in container for this to work
-                sh "docker exec $CONTAINER_NAME sh -c 'apt-get update && apt-get install -y curl'"
                 sh "docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello'"
                 echo "server is running fine"
             }
@@ -72,7 +72,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
+                // docker login
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                // push image to registry
                 sh "docker push $REGISTRY:$IMAGE_TAG"
             }
         }
@@ -81,11 +83,15 @@ pipeline {
         always { 
             cleanWs()
             sh 'docker logout'
+            // TODO: check that container is actually running before deleting it
             // stop and remove container
             sh "docker stop $CONTAINER_NAME"
             sh "docker rm $CONTAINER_NAME"
             // remove image
             sh "docker rmi $REGISTRY:$IMAGE_TAG"
         }
+        // TODO:
+        // on failure, send email
+        // on success, send email
     }
 }

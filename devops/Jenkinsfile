@@ -48,7 +48,7 @@ pipeline {
                 echo "Building image $REGISTRY:$IMAGE_TAG"
                 echo " Branch name: $BRANCH_NAME"
                 echo " Branch name: $env.BRANCH_NAME"
-                sh "docker build -t $REGISTRY:$IMAGE_TAG ./devops/$BRANCH_NAME/Dockerfile"
+                sh "docker build -t $REGISTRY:$IMAGE_TAG ./devops/$BRANCH_NAME"
             }
         }
 

@@ -24,7 +24,6 @@ pipeline {
         stage('Base image updated check') {
             steps {
                 script {
-                    echo "Node env==== $NODE_ENV"
                     echo 'Checking if base image needs to be updated'
 
                     if (currentBuild.previousBuild) {

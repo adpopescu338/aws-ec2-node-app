@@ -6,6 +6,7 @@ pipeline {
         REGISTRY = 'adpopescu3382/devops-playground'
         IMAGE_TAG = "node-app-${BRANCH_NAME}"
         CONTAINER_NAME = 'node-app'
+        NODE_ENV = BRANCH_NAME == 'master' ? 'production' : 'development'
     }
 
     stages {
@@ -50,7 +51,7 @@ pipeline {
             steps {
                 echo "Building image $REGISTRY:$IMAGE_TAG for branch $BRANCH_NAME"
                 // pass base image as build arg to Dockerfile
-                sh "docker build -t $REGISTRY:$IMAGE_TAG ./devops/$BRANCH_NAME --build-arg BASE_IMAGE=$REGISTRY:$IMAGE_TAG-base"
+                sh "docker build -t $REGISTRY:$IMAGE_TAG . --build-arg BASE_IMAGE=$REGISTRY:$IMAGE_TAG-base --build-arg NODE_ENV="
             }
         }
 

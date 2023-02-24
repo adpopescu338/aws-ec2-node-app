@@ -6,7 +6,13 @@ WORKDIR /app
 COPY package.json .
 COPY yarn.lock .
 
-RUN yarn install --production=true --frozen-lockfilech
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+# Only install dev dependencies if NODE_ENV is not set to production
+RUN if [ "$NODE_ENV" != "production" ]; then yarn install --frozen-lockfile;
+    else yarn install --production=true --frozen-lockfile; 
+    fi
 
 COPY . .
 

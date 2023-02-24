@@ -12,6 +12,10 @@ pipeline {
         stage('Check if base image needs to be updated') {
             steps {
                 script {
+                    echo 'Checking if base image needs to be updated'
+                    echo "DOCKERFILE_BASE: $DOCKERFILE_BASE"
+                    echo "DOCKERFILE_BASE: ${env.DOCKERFILE_BASE}"
+                    echo "DOCKERFILE_BASE: ${currentBuild.environment.get('DOCKERFILE_BASE')}"
                     def lastBuild = currentBuild.previousBuild
                     if (lastBuild) {
                         def lastDockerfile = lastBuild.environment.get('DOCKERFILE_BASE')

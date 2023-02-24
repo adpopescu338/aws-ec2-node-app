@@ -1,6 +1,7 @@
 pipeline {
     agent any
     environment {
+        DOCKERFILE_BASE = sh(script: 'cat devops/DockerfileBase', returnStdout: true)
         DOCKERHUB_CREDENTIALS = credentials('2255ea73-6c59-4ead-b350-a05ba2022fcc')
         REGISTRY = 'adpopescu3382/devops-playground'
         IMAGE_TAG = "node-app-${BRANCH_NAME}"
@@ -11,15 +12,21 @@ pipeline {
         stage('Check if base image needs to be updated') {
             steps {
                 script {
-                    dockerBuild(
-                        dockerfile: '/devops/DockerfileBase',
-                        contextPath: '.',
-                        additionalBuildArgs: '',
-                        tag: "$REGISTRY:$IMAGE_TAG-base",
-                        push: true,
-                        registry: REGISTRY,
-                        registryCredentials: DOCKERHUB_CREDENTIALS
-                    )
+                    def lastBuild = currentBuild.previousBuild
+                    if (lastBuild) {
+                        def lastDockerfile = lastBuild.environment.get('DOCKERFILE_BASE')
+                        if (DOCKERFILE_BASE != lastDockerfile) {
+                            echo 'DockerfileBase has changed, building new image'
+                            sh "docker build -f devops/DockerfileBase -t $REGISTRY:$IMAGE_TAG-base ."
+                            sh "docker push $REGISTRY:$IMAGE_TAG-base"
+                        } else {
+                            echo 'DockerfileBase has not changed, using existing image'
+                        }
+                    } else {
+                        echo 'No previous build found, building new image'
+                        sh "docker build -f devops/DockerfileBase -t $REGISTRY:$IMAGE_TAG-base ."
+                        sh "docker push $REGISTRY:$IMAGE_TAG-base"
+                    }
                 }
             }
         }

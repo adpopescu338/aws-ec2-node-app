@@ -17,8 +17,6 @@ pipeline {
                     echo "-----------------------"
                     echo "DOCKERFILE_BASE: ${env.DOCKERFILE_BASE}"
                     echo "-----------------------"
-                    echo "DOCKERFILE_BASE: ${currentBuild.environment.get('DOCKERFILE_BASE')}"
-                    echo "-----------------------"
                     def lastBuild = currentBuild.previousBuild
                     if (lastBuild) {
                         def lastDockerfile = lastBuild.environment.get('DOCKERFILE_BASE')

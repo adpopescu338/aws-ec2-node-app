@@ -6,7 +6,7 @@ pipeline {
         REGISTRY = 'adpopescu3382/devops-playground'
         IMAGE_TAG = "node-app-${BRANCH_NAME}"
         CONTAINER_NAME = 'node-app'
-        NODE_ENV = BRANCH_NAME == 'master' ? 'production' : 'development'
+        NODE_ENV = (BRANCH_NAME == 'master') ? 'production' : 'development'
     }
 
     stages {

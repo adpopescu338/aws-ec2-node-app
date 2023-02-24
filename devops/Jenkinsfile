@@ -63,7 +63,7 @@ pipeline {
             steps {
                 echo "Building image $REGISTRY:$IMAGE_TAG for branch $BRANCH_NAME"
                 // pass base image as build arg to Dockerfile
-                sh "docker build -t $REGISTRY:$IMAGE_TAG . --build-arg BASE_IMAGE=$REGISTRY:$IMAGE_TAG-base --build-arg NODE_ENV="
+                sh "docker build -t $REGISTRY:$IMAGE_TAG . --build-arg BASE_IMAGE=$REGISTRY:$IMAGE_TAG-base --build-arg NODE_ENV=$NODE_ENV"
             }
         }
 

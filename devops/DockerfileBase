@@ -2,7 +2,7 @@ FROM node:slim
 
 RUN apt-get update && apt-get install -y curl
 RUN echo "which yarn: $(which yarn)"
-RUN npm install -g yarn
+#RUN npm install -g yarn
 
 WORKDIR /app
 

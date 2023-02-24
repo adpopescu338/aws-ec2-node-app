@@ -1,3 +1,14 @@
+def get_node_env() {
+    switch (BRANCH_NAME) {
+        case 'master':
+            return 'production'
+        case 'develop':
+            return 'development'
+        default:
+            return 'development'
+    }
+}
+
 pipeline {
     agent any
     environment {
@@ -6,7 +17,7 @@ pipeline {
         REGISTRY = 'adpopescu3382/devops-playground'
         IMAGE_TAG = "node-app-${BRANCH_NAME}"
         CONTAINER_NAME = 'node-app'
-        NODE_ENV = (BRANCH_NAME == 'master') ? 'production' : 'development'
+        NODE_ENV = get_node_env()
     }
 
     stages {

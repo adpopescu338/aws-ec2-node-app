@@ -17,16 +17,17 @@ pipeline {
                     echo "-----------------------0"
                     echo "DOCKERFILE_BASE: ${env.DOCKERFILE_BASE}"
                     echo "-----------------------1"
-                    echo "currentBuild.previousBuild: ${currentBuild.previousBuild.buildVariables}"
+                    echo "currentBuild.previousBuild: ${currentBuild.previousBuild.buildVariables?.BASE_IMAGE}"
                     echo "-----------------------2"
 
                     if (currentBuild.previousBuild) {
                         echo 'Previous build found'
-                        def lastDockerfile = currentBuild.previousBuild.getEnvironment().get('devops/DockerfileBase')
-                        if (DOCKERFILE_BASE != lastDockerfile) {
+                        def lastDockerfileBase = currentBuild.previousBuild.buildVariables?.BASE_IMAGE
+                        if (DOCKERFILE_BASE != lastDockerfileBase) {
                             echo 'DockerfileBase has changed, building new image'
                             sh "docker build -f devops/DockerfileBase -t $REGISTRY:$IMAGE_TAG-base ."
                             sh "docker push $REGISTRY:$IMAGE_TAG-base"
+                            env.BASE_IMAGE = DOCKERFILE_BASE
                         } else {
                             echo 'DockerfileBase has not changed, using existing image'
                         }

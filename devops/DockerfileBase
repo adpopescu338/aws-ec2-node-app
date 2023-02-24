@@ -8,4 +8,4 @@ WORKDIR /app
 
 COPY package*.json .
 
-RUN yarn install --production=true --frozen-lockfile
+RUN yarn install --production=true --frozen-lockfilech

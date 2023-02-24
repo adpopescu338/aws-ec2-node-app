@@ -19,8 +19,7 @@ pipeline {
                     echo "-----------------------1"
                     echo "currentBuild.previousBuild: ${currentBuild.previousBuild}"
                     echo "-----------------------2"
-                    echo currentBuild.previousBuild
-                    echo "-----------------------3"
+
                     if (currentBuild.previousBuild) {
                         echo 'Previous build found'
                         def lastDockerfile = currentBuild.previousBuild.environment.get('DOCKERFILE_BASE')

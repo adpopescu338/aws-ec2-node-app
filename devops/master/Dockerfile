@@ -1,4 +1,4 @@
-FROM node:slim
+FROM adpopescu3382/devops-playground:node-app-master-base
 
 WORKDIR /app
 

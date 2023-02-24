@@ -4,9 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN echo "which yarn: $(which yarn)"
-
-RUN npm ci --only=production
+RUN yarn install --production=true --frozen-lockfilech
 
 COPY . .
 

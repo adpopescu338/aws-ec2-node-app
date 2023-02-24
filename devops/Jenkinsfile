@@ -17,7 +17,7 @@ pipeline {
                     echo "-----------------------0"
                     echo "DOCKERFILE_BASE: ${env.DOCKERFILE_BASE}"
                     echo "-----------------------1"
-                    echo "currentBuild.previousBuild: ${currentBuild.previousBuild}"
+                    echo "currentBuild.previousBuild: ${currentBuild.previousBuild.environment}"
                     echo "-----------------------2"
 
                     if (currentBuild.previousBuild) {

@@ -67,18 +67,21 @@ pipeline {
         }
 
         stage('Test') {
-            steps {
-                echo 'Testing..'
-                // start container
-                sh "docker run -d --name $CONTAINER_NAME -p 3000 $REGISTRY:$IMAGE_TAG"
-
+            def automatedTests (){
                 if (NODE_ENV == 'development') {
                     echo 'Running dev tests'
                     sh "docker exec $CONTAINER_NAME sh -c 'yarn test'"
                 } else {
                     echo 'Skipping dev tests'
                 }
+            }
 
+            steps {
+                echo 'Testing..'
+                // start container
+                sh "docker run -d --name $CONTAINER_NAME -p 3000 $REGISTRY:$IMAGE_TAG"
+                // run automated tests
+                automatedTests()
                 // check that server is running
                 sh "docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello'"
                 echo "server is running fine"

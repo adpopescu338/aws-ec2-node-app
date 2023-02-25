@@ -55,7 +55,7 @@ pipeline {
                 // stop and remove container
                 // start container
                 sh """
-                    ssh -tt root@192.168.0.4
+                    sshpass -p hello -tt root@192.168.0.4
                     ls -a
                     systemctl status docker
                     docker pull $REGISTRY:$IMAGE_TAG

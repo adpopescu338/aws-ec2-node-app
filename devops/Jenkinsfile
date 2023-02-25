@@ -82,6 +82,7 @@ pipeline {
                 // run automated tests
                 automatedTests()
                 // check that server is running
+                sh "which curl"
                 sh "docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello'"
                 echo "server is running fine"
             }

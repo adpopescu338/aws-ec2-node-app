@@ -20,7 +20,7 @@ def automatedTests (){
 def container_health_check() {
     // make a curl req to server and log response
     response = sh(script: """
-        docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello' | xargs echo"
+        docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello' | xargs echo
     """,
     returnStdout: true
     )

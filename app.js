@@ -7,7 +7,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/hello/:name", (req, res) => {
-  console.log("Api works. Hello World!");
+  console.log("Api works. Hello World! from " + req.params.name + "!");
   res.send(`Hello ${req.params.name}!`);
 });
 

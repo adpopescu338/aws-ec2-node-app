@@ -17,6 +17,23 @@ def automatedTests (){
     }
 }
 
+def container_health_check() {
+    // make a curl req to server and log response
+    response = sh("""
+        docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello' | tee /tmp/output.txt && cat /tmp/output.txt | xargs echo"
+    """)
+    echo "response: $response"
+
+    if( ! response){
+        echo "Container is not running"
+        // throw error to stop pipeline
+        error "Container is not running"
+    } else {
+        echo "Container is running"
+        return true
+    }
+}
+
 pipeline {
     agent any
     environment {
@@ -82,11 +99,7 @@ pipeline {
                 // run automated tests
                 automatedTests()
                 // check that server is running
-                // make a curl req to server and log response
-                sh """
-                    docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello' | tee /tmp/output.txt && cat /tmp/output.txt | xargs -I {} echo "server response: {}"
-                """
-                echo "server is running fine"
+                container_health_check()
             }
         }
 

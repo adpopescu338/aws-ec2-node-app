@@ -8,6 +8,14 @@ def get_node_env() {
             return 'development'
     }
 }
+def automatedTests (){
+    if (NODE_ENV == 'development') {
+        echo 'Running dev tests'
+        sh "docker exec $CONTAINER_NAME sh -c 'yarn test'"
+    } else {
+        echo 'Skipping dev tests'
+    }
+}
 
 pipeline {
     agent any
@@ -67,15 +75,6 @@ pipeline {
         }
 
         stage('Test') {
-            def automatedTests (){
-                if (NODE_ENV == 'development') {
-                    echo 'Running dev tests'
-                    sh "docker exec $CONTAINER_NAME sh -c 'yarn test'"
-                } else {
-                    echo 'Skipping dev tests'
-                }
-            }
-
             steps {
                 echo 'Testing..'
                 // start container

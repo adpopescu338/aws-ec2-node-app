@@ -84,7 +84,10 @@ pipeline {
                 // check that server is running
                 // make a curl req to server and log response
                 sh """
-                    docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello' | tee /tmp/output.txt && cat /tmp/output.txt
+                    docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello'
+                    | tee /tmp/output.txt 
+                    && cat /tmp/output.txt
+                    | xargs -I {} echo "server response: {}"
                 """
                 echo "server is running fine"
             }

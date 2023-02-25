@@ -42,7 +42,7 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('2255ea73-6c59-4ead-b350-a05ba2022fcc')
         REGISTRY = 'adpopescu3382/devops-playground'
         IMAGE_TAG = "node-app-${BRANCH_NAME}"
-        CONTAINER_NAME = 'node-app'
+        CONTAINER_NAME = "$IMAGE_TAG-container"
         NODE_ENV = get_node_env()
     }
 

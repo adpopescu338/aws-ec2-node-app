@@ -24,6 +24,38 @@
       </ul>
     </h3>
 
+    <h4>Update 25 Feb 2023</h4>
+    <p>
+      A lot of things happened in the last 2 days.
+      <br />
+      I'm still learning, but I'm getting there. I had 2 old PCs. I installed
+      Fedora server on both, and enabled ssh. They're currently running on my
+      desk, and I'm using them as servers.
+      <br />
+      I installed Jenkins and Docker on one of them, and I'm using it to build
+      and deploy my app.
+      <br />
+      So far I learned how to how to use Jenkins to build an image of my app.
+      <br />
+      The exiting part is that the image uses a custom image as a base. The
+      custom image includes all the dependencies that my app needs to run. This
+      should make the build process faster. And the even more exiting part is
+      that I'm using Jenkins to build the update the base image whenever it's
+      changed;
+
+      <br />
+      All this in a multi-branch pipeline.
+
+      <br />
+
+      The next step is to use my other pc to get the built image from the registry and run it as a container.
+
+      That is easy, but it must be automated. And for some reason I don't want to connect to the other pc with Jenkins.
+      <br>
+      It just feels wrong. 
+      I must automate this on the second PC.
+    </p>
+
     <button>Test api</button>
   </body>
   <script>

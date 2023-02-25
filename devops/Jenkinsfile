@@ -47,6 +47,27 @@ pipeline {
     }
 
     stages {
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+                // connect over ssh to server
+                // pull image
+                // stop and remove container
+                // start container
+                sh """
+                    ssh -tt root@192.168.0.4
+                    ls -a
+                    systemctl status docker
+                    docker pull $REGISTRY:$IMAGE_TAG
+                    docker stop $CONTAINER_NAME
+                    docker rm $CONTAINER_NAME
+                    docker run -d --name $CONTAINER_NAME -p 3000 $REGISTRY:$IMAGE_TAG
+                    exit
+                """
+                    
+            }
+        }
+
         stage('Base image updated check') {
             steps {
                 script {
@@ -111,27 +132,6 @@ pipeline {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                 // push image to registry
                 sh "docker push $REGISTRY:$IMAGE_TAG"
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-                // connect over ssh to server
-                // pull image
-                // stop and remove container
-                // start container
-                sh """
-                    ssh -tt root@@192.168.0.4
-                    ls -a
-                    systemctl status docker
-                    docker pull $REGISTRY:$IMAGE_TAG
-                    docker stop $CONTAINER_NAME
-                    docker rm $CONTAINER_NAME
-                    docker run -d --name $CONTAINER_NAME -p 3000 $REGISTRY:$IMAGE_TAG
-                    exit
-                """
-                    
             }
         }
     }

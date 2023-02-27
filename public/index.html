@@ -56,6 +56,29 @@
       I must automate this on the second PC.
     </p>
 
+    <h4>Update 27 Feb 2023</h4>
+    <p>
+      I managed to automate the process of building the base image, and pushing it to the registry.
+      <br>
+      I also managed to automate the process of pulling the image from the registry, and running it as a container.
+      <br>
+      This caused me some trouble because I decided to use watchtower to update the container whenever a new image is pushed to the registry.
+      But the watchtower container didn't stop until I used the --privileged flag, for some reason. 
+      <br>
+      Now I have a fully automated pipeline that builds, tests, and deploys my app.
+      <br>
+      I'm facing one issue with my public ip. Well, I don't have a static ip. Actually it's a very dynamic one. It changes every few hours, so if I really want to run stuff on my broken PCs, I need to get one. 
+      <br>
+      Unless...<br>
+      I could run an ec2 instance on AWS with a database and a web server. My pc would send a request to the web server, and it would save the ip in the database. 
+      <br>
+      Then, I can use the ip of the web server for github webhooks, and that would redirect the request to my pc.
+      <br>
+      It would be easier to use a static ip, but my idea is more exciting.
+      
+
+    </p>
+
     <button>Test api</button>
   </body>
   <script>

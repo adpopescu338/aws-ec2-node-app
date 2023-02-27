@@ -25,7 +25,7 @@ def container_health_check() {
     )
     echo "response: $response"
 
-    if( ! response){
+    if(!response){
         echo "Container is not running"
         // throw error to stop pipeline
         error "Container is not running"
@@ -47,27 +47,6 @@ pipeline {
     }
 
     stages {
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-                // connect over ssh to server
-                // pull image
-                // stop and remove container
-                // start container
-                sh """
-                    sshpass -p hello root@192.168.0.4
-                    ls -a
-                    systemctl status docker
-                    docker pull $REGISTRY:$IMAGE_TAG
-                    docker stop $CONTAINER_NAME
-                    docker rm $CONTAINER_NAME
-                    docker run -d --name $CONTAINER_NAME -p 3000 $REGISTRY:$IMAGE_TAG
-                    exit
-                """
-                    
-            }
-        }
-
         stage('Base image updated check') {
             steps {
                 script {
@@ -134,17 +113,19 @@ pipeline {
                 sh "docker push $REGISTRY:$IMAGE_TAG"
             }
         }
+
+
     }
     post { 
         always { 
             cleanWs()
             sh 'docker logout'
-            // TODO: check that container is actually running before deleting it
             // stop and remove container
-            sh "docker stop $CONTAINER_NAME"
-            sh "docker rm $CONTAINER_NAME"
+            sh "if docker ps | grep '$CONTAINER_NAME'; then docker stop $CONTAINER_NAME; fi"
+            sh "if docker ps -a | grep '$CONTAINER_NAME'; then docker rm $CONTAINER_NAME; fi"
+
             // remove image
-            sh "docker rmi $REGISTRY:$IMAGE_TAG"
+            sh "if docker images | grep '$REGISTRY:$IMAGE_TAG'; then docker rmi $REGISTRY:$IMAGE_TAG; fi"
         }
         // TODO:
         // on failure, send email

@@ -32,7 +32,7 @@ def automatedTests (){
 def container_health_check() {
     // make a curl req to server and log response
     response = sh(
-        script: "docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:3000/hello' | xargs echo",
+        script: "docker exec $CONTAINER_NAME sh -c 'curl -s http://localhost:$PORT/hello' | xargs echo",
         returnStdout: true
     )
     echo "response: $response"
@@ -57,6 +57,7 @@ pipeline {
         CONTAINER_NAME = "$IMAGE_TAG-container"
         NODE_ENV = get_node_env()
         PORT = get_port()
+        SENDER_EMAIL = credentials('sengrid_email_address')
     }
 
     stages {
@@ -101,7 +102,7 @@ pipeline {
             steps {
                 echo "Building image $REGISTRY:$IMAGE_TAG for branch $BRANCH_NAME"
                 // pass base image as build arg to Dockerfile
-                sh "docker build -t $REGISTRY:$IMAGE_TAG . --build-arg BASE_IMAGE=$REGISTRY:$IMAGE_TAG-base --build-arg NODE_ENV=$NODE_ENV"
+                sh "docker build -t $REGISTRY:$IMAGE_TAG . --build-arg BASE_IMAGE=$REGISTRY:$IMAGE_TAG-base --build-arg NODE_ENV=$NODE_ENV --build-arg PORT=$PORT"
             }
         }
 
@@ -140,8 +141,16 @@ pipeline {
             // remove image
             sh "if docker images | grep '$REGISTRY:$IMAGE_TAG'; then docker rmi $REGISTRY:$IMAGE_TAG; fi"
         }
-        // TODO:
-        // on failure, send email
-        // on success, send email
+        on {
+            failure {
+                echo 'Build failed'
+                // send email
+            }
+            success {
+                echo 'Build succeeded'
+                // send email
+              
+            }
+        }
     }
 }

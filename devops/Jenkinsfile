@@ -8,6 +8,18 @@ def get_node_env() {
             return 'development'
     }
 }
+
+def get_port() {
+    switch (BRANCH_NAME) {
+        case 'master':
+            return 3000
+        case 'develop':
+            return 3001
+        default:
+            return 3000
+    }
+}
+
 def automatedTests (){
     if (NODE_ENV == 'development') {
         echo 'Running dev tests'
@@ -44,6 +56,7 @@ pipeline {
         IMAGE_TAG = "node-app-${BRANCH_NAME}"
         CONTAINER_NAME = "$IMAGE_TAG-container"
         NODE_ENV = get_node_env()
+        PORT = get_port()
     }
 
     stages {

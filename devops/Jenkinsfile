@@ -141,16 +141,16 @@ pipeline {
             // remove image
             sh "if docker images | grep '$REGISTRY:$IMAGE_TAG'; then docker rmi $REGISTRY:$IMAGE_TAG; fi"
         }
-        on {
-            failure {
-                echo 'Build failed'
-                // send email
-            }
-            success {
-                echo 'Build succeeded'
-                // send email
-              
-            }
+      
+        failure {                
+            echo 'Build failed'
+            // send email
         }
+
+        success {
+            echo 'Build succeeded'
+            // send email      
+        }
+        
     }
 }
